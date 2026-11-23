@@ -1,0 +1,47 @@
+{
+  "name": "promptc",
+  "version": "0.1.0",
+  "description": "Add basic logic (variables, if/else, loops) to AI prompts so agents only see the instructions that apply, with checks that catch broken prompts before they're sent.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "promptc": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "cli": "tsx src/cli.ts",
+    "example": "tsx src/cli.ts render examples/support-agent/prompts/support.md --vars examples/support-agent/vars --data customer=examples/support-agent/runtime/customer.json --data ticket=examples/support-agent/runtime/ticket.json"
+  },
+  "keywords": [
+    "prompt",
+    "template",
+    "twig",
+    "llm",
+    "prompt-engineering",
+    "deterministic"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "twig": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.0"
+  }
+}

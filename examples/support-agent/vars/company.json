@@ -1,0 +1,12 @@
+{
+  "name": "Acme",
+  "product": "Acme Cloud",
+  "tone": "friendly and direct",
+  "helpCenter": "https://help.example.com",
+  "escalation": { "email": "support-leads@example.com" },
+  "rules": [
+    "Never promise a feature or a date that isn't on the public roadmap",
+    "Never ask for a password or full card number",
+    "End with one clear next step for the customer"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "category": "billing",
+  "priority": "normal",
+  "subject": "Example subject",
+  "message": "Example message",
+  "attachments": ["invoice.pdf"]
+}

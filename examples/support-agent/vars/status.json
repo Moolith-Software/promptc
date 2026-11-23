@@ -1,0 +1,9 @@
+{
+  "isEnterprise": "customer.plan == 'enterprise'",
+  "isTrial": "customer.plan == 'trial'",
+  "trialEndingSoon": "status.isTrial and customer.trialDaysLeft <= 3",
+  "isBilling": "ticket.category == 'billing'",
+  "isUrgent": "ticket.priority == 'urgent' or status.isEnterprise",
+  "openTicketCount": "customer.openTickets|length",
+  "summary": "'Plan: ' ~ customer.plan ~ ' · Category: ' ~ ticket.category ~ ' · Priority: ' ~ ticket.priority"
+}

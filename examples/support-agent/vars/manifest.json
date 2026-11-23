@@ -1,0 +1,5 @@
+{
+  "static": ["company"],
+  "runtime": ["customer", "ticket"],
+  "computed": ["status"]
+}

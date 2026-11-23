@@ -1,0 +1,8 @@
+{
+  "name": "Jordan",
+  "language": "English",
+  "plan": "trial",
+  "trialDaysLeft": 7,
+  "accountManager": "Sam",
+  "openTickets": [{ "id": 101, "subject": "Example" }]
+}
