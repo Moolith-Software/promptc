@@ -195,3 +195,66 @@ test("output is not HTML-escaped", () => {
   const engine = createEngine({ namespaces: { s: { kind: "static", data: { v: "<b>&\"" } } } });
   assert.equal(engine.render("{{ s.v }}"), "<b>&\"");
 });
+
+test("README visual styling example renders as documented", () => {
+  const template = `Design the hero section of {{ site.name }}'s landing page.
+
+{% if look.isDark %}
+Use a dark background ({{ look.palette.background }}) with light text ({{ look.palette.text }}).
+{% else %}
+Use a light background ({{ look.palette.background }}) with dark text ({{ look.palette.text }}).
+{% endif %}
+Use {{ colors.accent }} for the main button, and nowhere else.
+
+{% if site.device == 'mobile' %}
+Stack the headline, text and button in a single column. Keep the headline under 6 words.
+{% else %}
+Put the headline and text on the left, and a product image on the right.
+{% endif %}
+{% if site.buttonLabel is defined %}
+The button says "{{ site.buttonLabel }}".
+{% endif %}
+`;
+  const engine = createEngine({
+    namespaces: {
+      colors: {
+        kind: "static",
+        data: {
+          accent: "#FF5A1F",
+          dark: { background: "#111827", text: "#F9FAFB" },
+          light: { background: "#FFFFFF", text: "#111827" },
+        },
+      },
+      site: { kind: "runtime" },
+      look: {
+        kind: "computed",
+        rules: {
+          isDark: "site.theme == 'dark'",
+          palette: "look.isDark ? colors.dark : colors.light",
+        },
+      },
+    },
+  });
+  assert.deepEqual(engine.check({ hero: template }).diagnostics, []);
+  assert.equal(
+    engine.render(template, { data: { site: { name: "Acme", theme: "dark", device: "mobile", buttonLabel: "Start free" } } }),
+    `Design the hero section of Acme's landing page.
+
+Use a dark background (#111827) with light text (#F9FAFB).
+Use #FF5A1F for the main button, and nowhere else.
+
+Stack the headline, text and button in a single column. Keep the headline under 6 words.
+The button says "Start free".
+`,
+  );
+  assert.equal(
+    engine.render(template, { data: { site: { name: "Acme", theme: "light", device: "desktop" } } }),
+    `Design the hero section of Acme's landing page.
+
+Use a light background (#FFFFFF) with dark text (#111827).
+Use #FF5A1F for the main button, and nowhere else.
+
+Put the headline and text on the left, and a product image on the right.
+`,
+  );
+});

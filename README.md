@@ -1,5 +1,11 @@
 # promptc
 
+> [!WARNING]
+> **Not yet reviewed or tested by a human.** This code was written with AI
+> assistance. It has an automated test suite, but no person has reviewed the
+> code or tested it by hand. Treat it as experimental: read the code before
+> relying on it, and don't use it in production without your own review.
+
 Add basic logic to your prompts (variables, if/else, loops) so an AI
 agent only sees the instructions that apply to the situation in front of it.
 
@@ -67,6 +73,84 @@ paragraph and the refund-eligibility section of the policy doc. It never
 sees the enterprise instructions, the help-center line, or the rest of the
 refund policy. `status.isTrial` is a *computed property*: a condition
 defined once (`"customer.plan == 'trial'"`) and reused across prompts by name.
+
+## Example: visual styling
+
+The same idea works for design instructions. One template covers dark and
+light sites, on mobile and desktop:
+
+```twig
+Design the hero section of {{ site.name }}'s landing page.
+
+{% if look.isDark %}
+Use a dark background ({{ look.palette.background }}) with light text ({{ look.palette.text }}).
+{% else %}
+Use a light background ({{ look.palette.background }}) with dark text ({{ look.palette.text }}).
+{% endif %}
+Use {{ colors.accent }} for the main button, and nowhere else.
+
+{% if site.device == 'mobile' %}
+Stack the headline, text and button in a single column. Keep the headline under 6 words.
+{% else %}
+Put the headline and text on the left, and a product image on the right.
+{% endif %}
+{% if site.buttonLabel is defined %}
+The button says "{{ site.buttonLabel }}".
+{% endif %}
+```
+
+The colors are set up once, and two computed properties pick the right set:
+
+```ts
+const engine = createEngine({
+  namespaces: {
+    colors: {
+      kind: "static",
+      data: {
+        accent: "#FF5A1F",
+        dark:  { background: "#111827", text: "#F9FAFB" },
+        light: { background: "#FFFFFF", text: "#111827" },
+      },
+    },
+    site: { kind: "runtime" },
+    look: {
+      kind: "computed",
+      rules: {
+        isDark:  "site.theme == 'dark'",
+        palette: "look.isDark ? colors.dark : colors.light", // returns a whole color set
+      },
+    },
+  },
+});
+```
+
+With `site` set to `{ name: "Acme", theme: "dark", device: "mobile", buttonLabel: "Start free" }`,
+the model sees:
+
+```text
+Design the hero section of Acme's landing page.
+
+Use a dark background (#111827) with light text (#F9FAFB).
+Use #FF5A1F for the main button, and nowhere else.
+
+Stack the headline, text and button in a single column. Keep the headline under 6 words.
+The button says "Start free".
+```
+
+With `{ name: "Acme", theme: "light", device: "desktop" }` and no button
+label, the model sees:
+
+```text
+Design the hero section of Acme's landing page.
+
+Use a light background (#FFFFFF) with dark text (#111827).
+Use #FF5A1F for the main button, and nowhere else.
+
+Put the headline and text on the left, and a product image on the right.
+```
+
+The model is never told "if the site is dark, use these colors, otherwise
+use those". It gets one set of colors and one layout, already decided.
 
 Templates use [Twig](https://twig.symfony.com/doc/3.x/templates.html)
 syntax. Putting logic in prompt templates isn't a new idea, and several
